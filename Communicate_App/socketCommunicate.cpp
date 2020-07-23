@@ -181,7 +181,7 @@ void socketCommunicate::analyReceivingData()
                 message.push_back(byte_r);
             }
             cout<<message<<endl;
-            if(strcmp(message,"pitch")==0)
+            if(strcmp(str2Char(message),"pitch")==0)
             {
                 while(true)
                 {
@@ -199,7 +199,7 @@ void socketCommunicate::analyReceivingData()
                 stringstream geek(message);
                 geek >> pitch;  
 
-            }else if(strcmp(message,"roll")==0)
+            }else if(strcmp(str2Char(message),"roll")==0)
             {
 
                 while(true)
@@ -251,7 +251,7 @@ void socketCommunicate::analyReceivingData()
             }
             cout<<message<<endl;
             
-            if(strcmp(message,"throttle")==0)
+            if(strcmp(str2Char(message),"throttle")==0)
             {
                 while(true)
                 {
@@ -269,7 +269,7 @@ void socketCommunicate::analyReceivingData()
                 stringstream geek(message);
                 geek >> throttle;  
 
-            }else if(strcmp(message,"yaw")==0)
+            }else if(strcmp(str2Char(message),"yaw")==0)
             {
 
                 while(true)
@@ -304,27 +304,28 @@ void socketCommunicate::analyReceivingData()
                 message.push_back(byte_r);
             }
             cout<<message<<endl;
-            handleMotorCut();
+            handleMotorCut(message);
             break;
 
-	// }
+	 }
     return;
 
 }
-void socketCommunicate::handleMotorCut()
+
+void socketCommunicate::handleMotorCut(string message)
 {
-    if(strcmp(message,"on")==0)
+    if(strcmp(str2Char(message),"on")==0)
     {
         
 
-    }else if(strcmp(message,"off")==0)
+    }else if(strcmp(str2Char(message),"off")==0)
     {
 
         
-    } else if(strcmp(message,"cw")==0)
+    } else if(strcmp(str2Char(message),"cw")==0)
     {
 
-    } else if(strcmp(message,"ccw")==0)
+    } else if(strcmp(str2Char(message),"ccw")==0)
     {
 
     }
