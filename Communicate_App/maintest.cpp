@@ -3,6 +3,7 @@ int main()
 {
 	socketCommunicate test;
 	test.Init();
-	test.ConnectClient();
+	
+	test.ConnectClient();	
 	return 0;
 }

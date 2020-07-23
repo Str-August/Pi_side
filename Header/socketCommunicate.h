@@ -13,6 +13,8 @@
 #include <poll.h>
 #include <arpa/inet.h>
 #include<iostream>
+#include <sstream> 
+
 using namespace std;
 
 #define POLL_SIZE 35	// fd max (number client ) can connect server
@@ -26,18 +28,20 @@ private:
 	struct pollfd client_fd[POLL_SIZE];
 	socklen_t clilen;
 	struct sockaddr_in server_address,client_address;
+	unsigned char byte_r;
+	int throttle,yaw,roll,pitch;
+	bool power;
 
 
 public:
 	void Init(); // create a socket, poll structure
     void EventServer(); // manager all event in server socket include accept connect from a client
-    
-	
-
-
+    void analyReceivingData();
+    void handleMotorCut()
     void ConnectClient(); //just test but can use it's structure fod do the socket connect later
 	
 	
 	
 };
 
+	
