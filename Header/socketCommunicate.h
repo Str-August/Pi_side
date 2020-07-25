@@ -37,7 +37,7 @@ public:
 	void Init(); // create a socket, poll structure
     void EventServer(); // manager all event in server socket include accept connect from a client
     void analyReceivingData();
-    void handleMotorCut()
+    void handleMotorCut(string message);
     void ConnectClient(); //just test but can use it's structure fod do the socket connect later
 	
 	

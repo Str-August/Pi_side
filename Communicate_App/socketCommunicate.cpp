@@ -152,7 +152,7 @@ void socketCommunicate::analyReceivingData()
 	char* p;
 	while(true)
 	{
-		read(sockfd, &byte_r , sizeof(byte_r));
+		read(sockfd, &byte_r , sizeof(byte_r));   
 		if(byte_r < '0'|| byte_r > '9') break;
 		lenMess = lenMess*10 + (byte_r-'0');
 	}
@@ -162,16 +162,16 @@ void socketCommunicate::analyReceivingData()
 		read(sockfd, &byte_r , sizeof(byte_r));
 		message.push_back(byte_r);
 	}
-    //cout<<message<<endl;
+    cout<<message<<endl;
     
 	switch(str2int(str2Char(message)))
 	{
         case str2int("JoyR"):
-            message.clear();
+            message.clear();lenMess=0;
             while(true)
             {
                 read(sockfd, &byte_r , sizeof(byte_r));
-                if(byte_r < '0'|| byte_r > '9') break;
+                if(byte_r < '0' || byte_r > '9') break;
                 lenMess = lenMess*10 + (byte_r-'0');
             }
             for (int i = 0; i < lenMess; ++i)
@@ -183,6 +183,7 @@ void socketCommunicate::analyReceivingData()
             cout<<message<<endl;
             if(strcmp(str2Char(message),"pitch")==0)
             {
+                message.clear();lenMess=0;
                 while(true)
                 {
                     read(sockfd, &byte_r , sizeof(byte_r));
@@ -201,6 +202,7 @@ void socketCommunicate::analyReceivingData()
 
             }else if(strcmp(str2Char(message),"roll")==0)
             {
+                message.clear();lenMess=0;
 
                 while(true)
                 {
@@ -220,7 +222,7 @@ void socketCommunicate::analyReceivingData()
             }
             break;
         case str2int("power"):
-            message.clear();
+            message.clear();lenMess = 0;
             while(true)
             {
                 read(sockfd, &byte_r , sizeof(byte_r));
@@ -236,7 +238,7 @@ void socketCommunicate::analyReceivingData()
             cout<<message<<endl;
             break;
         case str2int("JoyL"):
-            message.clear();
+            message.clear();lenMess = 0;
             while(true)
             {
                 read(sockfd, &byte_r , sizeof(byte_r));
@@ -250,9 +252,10 @@ void socketCommunicate::analyReceivingData()
                 message.push_back(byte_r);
             }
             cout<<message<<endl;
-            
+           
             if(strcmp(str2Char(message),"throttle")==0)
             {
+                message.clear();lenMess=0;
                 while(true)
                 {
                     read(sockfd, &byte_r , sizeof(byte_r));
@@ -271,6 +274,7 @@ void socketCommunicate::analyReceivingData()
 
             }else if(strcmp(str2Char(message),"yaw")==0)
             {
+                message.clear();lenMess=0;
 
                 while(true)
                 {
@@ -290,7 +294,7 @@ void socketCommunicate::analyReceivingData()
             }
             break;
         case str2int("motor"):
-            message.clear();
+            message.clear(); lenMess =0;
             while(true)
             {
                 read(sockfd, &byte_r , sizeof(byte_r));
