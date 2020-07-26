@@ -174,52 +174,31 @@ void socketCommunicate::analyReceivingData()
                 if(byte_r < '0' || byte_r > '9') break;
                 lenMess = lenMess*10 + (byte_r-'0');
             }
+            pitch =0;
             for (int i = 0; i < lenMess; ++i)
             {
                 /* code */
                 read(sockfd, &byte_r , sizeof(byte_r));
-                message.push_back(byte_r);
+                pitch = pitch*10 +(byte_r-'0');
             }
-            cout<<message<<endl;
-            if(strcmp(str2Char(message),"pitch")==0)
+            cout<<pitch<<endl;
+            
+            message.clear();lenMess=0;
+            while(true)
             {
-                message.clear();lenMess=0;
-                while(true)
-                {
-                    read(sockfd, &byte_r , sizeof(byte_r));
-                    if(byte_r < '0'|| byte_r > '9') break;
-                    lenMess = lenMess*10 + (byte_r-'0');
-                }
-                for (int i = 0; i < lenMess; ++i)
-                {
-                    /* code */
-                    read(sockfd, &byte_r , sizeof(byte_r));
-                    message.push_back(byte_r);
-                }
-                cout<<message<<endl;
-                stringstream geek(message);
-                geek >> pitch;  
-
-            }else if(strcmp(str2Char(message),"roll")==0)
-            {
-                message.clear();lenMess=0;
-
-                while(true)
-                {
-                    read(sockfd, &byte_r , sizeof(byte_r));
-                    if(byte_r < '0'|| byte_r > '9') break;
-                    lenMess = lenMess*10 + (byte_r-'0');
-                }
-                for (int i = 0; i < lenMess; ++i)
-                {
-                    /* code */
-                    read(sockfd, &byte_r , sizeof(byte_r));
-                    message.push_back(byte_r);
-                }
-                cout<<message<<endl;
-                stringstream geek(message);
-                geek >> roll;  
+                read(sockfd, &byte_r , sizeof(byte_r));
+                if(byte_r < '0'|| byte_r > '9') break;
+                lenMess = lenMess*10 + (byte_r-'0');
             }
+            roll =0;
+            for (int i = 0; i < lenMess; ++i)
+            {
+                /* code */
+                read(sockfd, &byte_r , sizeof(byte_r));
+                roll = roll*10+(byte_r-'0');
+            }
+            cout<<roll<<endl;
+            
             break;
         case str2int("power"):
             message.clear();lenMess = 0;
@@ -245,53 +224,31 @@ void socketCommunicate::analyReceivingData()
                 if(byte_r < '0'|| byte_r > '9') break;
                 lenMess = lenMess*10 + (byte_r-'0');
             }
+            throttle =0;
             for (int i = 0; i < lenMess; ++i)
             {
                 /* code */
                 read(sockfd, &byte_r , sizeof(byte_r));
-                message.push_back(byte_r);
+                throttle = throttle*10+ (byte_r -'0');
+                
             }
-            cout<<message<<endl;
-           
-            if(strcmp(str2Char(message),"throttle")==0)
+            cout<<throttle<<endl;
+            message.clear();lenMess=0; 
+            while(true)
             {
-                message.clear();lenMess=0;
-                while(true)
-                {
-                    read(sockfd, &byte_r , sizeof(byte_r));
-                    if(byte_r < '0'|| byte_r > '9') break;
-                    lenMess = lenMess*10 + (byte_r-'0');
-                }
-                for (int i = 0; i < lenMess; ++i)
-                {
-                    /* code */
-                    read(sockfd, &byte_r , sizeof(byte_r));
-                    message.push_back(byte_r);
-                }
-                cout<<message<<endl;
-                stringstream geek(message);
-                geek >> throttle;  
-
-            }else if(strcmp(str2Char(message),"yaw")==0)
-            {
-                message.clear();lenMess=0;
-
-                while(true)
-                {
-                    read(sockfd, &byte_r , sizeof(byte_r));
-                    if(byte_r < '0'|| byte_r > '9') break;
-                    lenMess = lenMess*10 + (byte_r-'0');
-                }
-                for (int i = 0; i < lenMess; ++i)
-                {
-                    /* code */
-                    read(sockfd, &byte_r , sizeof(byte_r));
-                    message.push_back(byte_r);
-                }
-                cout<<message<<endl;
-                stringstream geek(message);
-                geek >> yaw;  
+                read(sockfd, &byte_r , sizeof(byte_r));
+                if(byte_r < '0'|| byte_r > '9') break;
+                lenMess = lenMess*10 + (byte_r-'0');
             }
+            yaw =0;
+            for (int i = 0; i < lenMess; ++i)
+            {
+                /* code */
+                read(sockfd, &byte_r , sizeof(byte_r));
+                yaw =10*yaw + (byte_r - '0');
+            }
+            cout<<yaw<<endl;
+            //cout<<yaw<<endl;
             break;
         case str2int("motor"):
             message.clear(); lenMess =0;
