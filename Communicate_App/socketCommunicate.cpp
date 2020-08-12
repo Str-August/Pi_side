@@ -1,13 +1,14 @@
 #include "../Header/socketCommunicate.h"
 #include "../Header/utility.h"
-void socketCommunicate::Init()
+void socketCommunicate::Init() // init the value 
 {
     bzero((struct sockaddr *)&server_address,sizeof(server_address));
     server_address.sin_family = AF_INET;
     server_address.sin_addr.s_addr = htonl(INADDR_ANY);
     server_address.sin_port = htons(LOCAL_HOST_SOCK);
-    power = false;
-    throttle = roll = pitch = yaw = 0;
+    power = false; saveVideo = false; pw_CutMotor = false; m_clockwise = false;
+    roll = pitch = yaw = 1500;
+    throttle = 1000;
     int rc = 0;
     int temp = 1;
     int chek;
@@ -49,7 +50,7 @@ void socketCommunicate::Init()
     }
 
     maxi = 0;
-    cout<<"Waiting for client......... \n"<<endl;
+    cout<<"Waiting for connection........ \n"<<endl;
 
 
 }
@@ -73,7 +74,7 @@ void socketCommunicate::EventServer()
         if(i == POLL_SIZE)
         {	
             char buf[20];
-            strcpy(buf,"too many client");/*Max index in client[] array*/
+            strcpy(buf,"too many connection");/*Max index in client[] array*/
             write(connfd,&buf,20);
         }
 
@@ -112,7 +113,7 @@ void socketCommunicate::ConnectClient()
                     if( errno == ECONNRESET)
                     {
                         /**connection rest by client*/
-                        
+                        power = false;
                         close(sockfd);
                         client_fd[i].fd =-1;
                     }
@@ -124,8 +125,8 @@ void socketCommunicate::ConnectClient()
                 else if (n==0)
                 {
                     /**connection close by client*/
-                    cout<<"Socket have fd : "<< sockfd <<"is closing"<<endl;
-                    
+                    cout<<"Socket have fd : "<< sockfd <<"is disconnected"<<endl;
+                    power = false;
                     close(sockfd);
                     client_fd[i].fd = -1;
                 }
@@ -162,7 +163,7 @@ void socketCommunicate::analyReceivingData()
 		read(sockfd, &byte_r , sizeof(byte_r));
 		message.push_back(byte_r);
 	}
-    cout<<message<<endl;
+    cout<<message << " : ";
     
 	switch(str2int(str2Char(message)))
 	{
@@ -174,14 +175,17 @@ void socketCommunicate::analyReceivingData()
                 if(byte_r < '0' || byte_r > '9') break;
                 lenMess = lenMess*10 + (byte_r-'0');
             }
+            if(lenMess == 0) break;
             pitch =0;
             for (int i = 0; i < lenMess; ++i)
             {
                 /* code */
                 read(sockfd, &byte_r , sizeof(byte_r));
-                pitch = pitch*10 +(byte_r-'0');
+                message.push_back(byte_r);
+                
             }
-            cout<<pitch<<endl;
+            pitch = atoi(str2Char(message));
+            cout<<"pitch: "<<pitch<<" roll: ";
             
             message.clear();lenMess=0;
             while(true)
@@ -190,13 +194,13 @@ void socketCommunicate::analyReceivingData()
                 if(byte_r < '0'|| byte_r > '9') break;
                 lenMess = lenMess*10 + (byte_r-'0');
             }
-            roll =0;
             for (int i = 0; i < lenMess; ++i)
             {
                 /* code */
                 read(sockfd, &byte_r , sizeof(byte_r));
-                roll = roll*10+(byte_r-'0');
+                message.push_back(byte_r);
             }
+            roll = atoi(str2Char(message));
             cout<<roll<<endl;
             
             break;
@@ -229,10 +233,11 @@ void socketCommunicate::analyReceivingData()
             {
                 /* code */
                 read(sockfd, &byte_r , sizeof(byte_r));
-                throttle = throttle*10+ (byte_r -'0');
+                message.push_back(byte_r);
                 
             }
-            cout<<throttle<<endl;
+            throttle = atoi(str2Char(message));
+            cout<<"throttle: "<<throttle<<" yaw: ";
             message.clear();lenMess=0; 
             while(true)
             {
@@ -245,8 +250,9 @@ void socketCommunicate::analyReceivingData()
             {
                 /* code */
                 read(sockfd, &byte_r , sizeof(byte_r));
-                yaw =10*yaw + (byte_r - '0');
+                message.push_back(byte_r);
             }
+            yaw = atoi(str2Char(message));
             cout<<yaw<<endl;
             //cout<<yaw<<endl;
             break;
@@ -277,17 +283,61 @@ void socketCommunicate::handleMotorCut(string message)
 {
     if(strcmp(str2Char(message),"on")==0)
     {
-        
+        pw_CutMotor = true;
+        setUp_motor();
 
     }else if(strcmp(str2Char(message),"off")==0)
     {
-
+        pw_CutMotor = false;
+        dowm_motor();
         
     } else if(strcmp(str2Char(message),"cw")==0)
     {
-
+        m_clockwise = true;
+        if(pw_CutMotor&&m_clockwise)
+        {
+            cw_motor(125);
+        }
     } else if(strcmp(str2Char(message),"ccw")==0)
     {
-
+        m_clockwise = false;
+        if(pw_CutMotor&&!m_clockwise)
+        {
+            ccw_motor(125);
+        }
     }
+}
+
+bool socketCommunicate::get_powerStatus()
+{
+    return power;
+}
+bool socketCommunicate::get_saveVideoStatus()
+{
+    return saveVideo;
+}
+bool socketCommunicate::get_pw_CutMotorStatus()
+{
+    return pw_CutMotor;
+}
+bool socketCommunicate::get_m_clockwiseStatus()
+{
+    return m_clockwise;
+}
+
+int socketCommunicate::get_throttle()
+{
+    return throttle;
+}
+int socketCommunicate::get_yaw()
+{
+    return yaw;
+}
+int socketCommunicate::get_roll()
+{
+    return roll;
+}
+int socketCommunicate::get_pitch()
+{
+    return pitch;
 }

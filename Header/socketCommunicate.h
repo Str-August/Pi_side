@@ -17,7 +17,7 @@
 
 using namespace std;
 
-#define POLL_SIZE 35	// fd max (number client ) can connect server
+#define POLL_SIZE 2	// fd max (number client ) can connect server
 #define LOCAL_HOST_SOCK 5533  // local host for socket
 
 class socketCommunicate {
@@ -30,7 +30,7 @@ private:
 	struct sockaddr_in server_address,client_address;
 	unsigned char byte_r;
 	int throttle,yaw,roll,pitch;
-	bool power;
+	bool power,saveVideo,pw_CutMotor,m_clockwise;
 
 
 public:
@@ -40,7 +40,17 @@ public:
     void handleMotorCut(string message);
     void ConnectClient(); //just test but can use it's structure fod do the socket connect later
 	
-	
+	bool get_powerStatus();
+	bool get_saveVideoStatus();
+	bool get_pw_CutMotorStatus();
+	bool get_m_clockwiseStatus();
+
+	int get_throttle();
+	int get_yaw();
+	int get_roll();
+	int get_pitch();
+
+
 	
 };
 
