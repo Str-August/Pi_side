@@ -283,29 +283,38 @@ void socketCommunicate::handleMotorCut(string message)
 {
     if(strcmp(str2Char(message),"on")==0)
     {
-        pw_CutMotor = true;
-        setUp_motor();
-
+        pwm_setup();
+        pwm_out();
     }else if(strcmp(str2Char(message),"off")==0)
     {
-        pw_CutMotor = false;
-        dowm_motor();
-        
-    } else if(strcmp(str2Char(message),"cw")==0)
-    {
-        m_clockwise = true;
-        if(pw_CutMotor&&m_clockwise)
-        {
-            cw_motor(125);
-        }
-    } else if(strcmp(str2Char(message),"ccw")==0)
-    {
-        m_clockwise = false;
-        if(pw_CutMotor&&!m_clockwise)
-        {
-            ccw_motor(125);
-        }
+       pwm_close();
     }
+
+    // if(strcmp(str2Char(message),"on")==0)
+    // {
+    //     pw_CutMotor = true;
+    //     setUp_motor();
+
+    // }else if(strcmp(str2Char(message),"off")==0)
+    // {
+    //     pw_CutMotor = false;
+    //     dowm_motor();
+        
+    // } else if(strcmp(str2Char(message),"cw")==0)
+    // {
+    //     m_clockwise = true;
+    //     if(pw_CutMotor&&m_clockwise)
+    //     {
+    //         cw_motor(125);
+    //     }
+    // } else if(strcmp(str2Char(message),"ccw")==0)
+    // {
+    //     m_clockwise = false;
+    //     if(pw_CutMotor&&!m_clockwise)
+    //     {
+    //         ccw_motor(125);
+    //     }
+    // }
 }
 
 bool socketCommunicate::get_powerStatus()
