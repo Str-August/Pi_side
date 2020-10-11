@@ -61,6 +61,7 @@ int active_motor()
 		pwmWrite(PWM_pin, i);
 		delay(1);
 	}
+	return 0;
 }
 int stop_motor()
 {
@@ -69,6 +70,7 @@ int stop_motor()
 		pwmWrite(PWM_pin, i);
 		delay(1);
 	}
+	return 0;
 }
 // bool setUp_motor()
 // {
