@@ -1,4 +1,5 @@
 #include"../Header/socketCommunicate.h"
+socketCommunicate socket;
 void * sendSerial_SBUS (void * socket)
 {
 	//static unsigned int pre_time = micros();
@@ -16,14 +17,14 @@ void * sendSerial_SBUS (void * socket)
 }
 int main()
 {
-	socketCommunicate test;
-	test.Init();
+	
+	socket.Init();
 	
 	pthread_t thread;
-	pthread_create(&thread, NULL, sendSerial_SBUS, (void *) &test );
+	//pthread_create(&thread, NULL, sendSerial_SBUS, (void *) &test );
 
 
-	test.ConnectClient();	
+	socket.ConnectClient();	
 
 	return 0;
 }

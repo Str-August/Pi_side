@@ -19,7 +19,7 @@
 #define PWM_CHANNEL 0
 // This controls the max range of the PWM signal
 #define RANGE 1024
-
+#define PWM_pin 1
 #define IN1 4
 #define IN2 5
 using namespace std;
@@ -43,6 +43,33 @@ char *str2Char(std::string str)
 	return cStr;
 }
 
+bool setup_motor()
+{
+	if (wiringPiSetup() == -1)
+		return false;
+	pinMode(PWM_pin, PWM_OUTPUT);
+	//pwmSetClock (divisor)
+	//pwmSetMode (mode) mode can be PWM_MODE_BAL  or PWM_MODE_MS
+	//pwmSetRange (range)
+	return true;
+}
+int active_motor()
+{
+	// max range is 1024 default range
+	for (int i = 0; i < 1024; i++)
+	{
+		pwmWrite(PWM_pin, i);
+		delay(1);
+	}
+}
+int stop_motor()
+{
+	for (int i = 1023; i > 0; i--)
+	{
+		pwmWrite(PWM_pin, i);
+		delay(1);
+	}
+}
 // bool setUp_motor()
 // {
 // 	if (wiringPiSetup() == -1)
@@ -51,51 +78,51 @@ char *str2Char(std::string str)
 // 	}
 // 	return 1;
 // }
-int pwm_setup()
-{
-	try
-	{
-		if (!bcm2835_init())
-			throw myex;
+// int pwm_setup()
+// {
+// 	try
+// 	{
+// 		if (wiringPiSetup()==-1)
+// 			throw myex;
 
-		// Set the output pin to Alt Fun 5, to allow PWM channel 0 to be output there
-		bcm2835_gpio_fsel(PIN, BCM2835_GPIO_FSEL_ALT5);
+// 		// Set the output pin to Alt Fun 5, to allow PWM channel 0 to be output there
+// 		bcm2835_gpio_fsel(PIN, BCM2835_GPIO_FSEL_ALT5);
 
-		// Clock divider is set to 16.
-		// With a divider of 16 and a RANGE of 1024, in MARKSPACE mode,
-		// the pulse repetition frequency will be
-		// 1.2MHz/1024 = 1171.875Hz, suitable for driving a DC motor with PWM
-		bcm2835_pwm_set_clock(BCM2835_PWM_CLOCK_DIVIDER_16);
-		bcm2835_pwm_set_mode(PWM_CHANNEL, 1, 1);
-		bcm2835_pwm_set_range(PWM_CHANNEL, RANGE);
-		throw myex; // ifnot
-	}
-	catch (exception &e)
-	{
-		cout << e.what() << '\n';
-		return -1;
-	}
-	return 1;
-}
+// 		// Clock divider is set to 16.
+// 		// With a divider of 16 and a RANGE of 1024, in MARKSPACE mode,
+// 		// the pulse repetition frequency will be
+// 		// 1.2MHz/1024 = 1171.875Hz, suitable for driving a DC motor with PWM
+// 		bcm2835_pwm_set_clock(BCM2835_PWM_CLOCK_DIVIDER_16);
+// 		bcm2835_pwm_set_mode(PWM_CHANNEL, 1, 1);
+// 		bcm2835_pwm_set_range(PWM_CHANNEL, RANGE);
+// 		throw myex; // ifnot
+// 	}
+// 	catch (exception &e)
+// 	{
+// 		cout << e.what() << '\n';
+// 		return -1;
+// 	}
+// 	return 1;
+// }
 
-void pwm_out(int direction = 1, int data = 1)
-{
-	for (int i = 0; i < 1024; i++)
-	{
-		// if (data == 1)
-		//     direction = 1;   // Switch to increasing
-		// else if (data == RANGE-1)
-		//     direction = -1;  // Switch to decreasing
-		// data += direction;
-		bcm2835_pwm_set_data(PWM_CHANNEL, i);
-		bcm2835_delay(1);
-	}
-}
+// void pwm_out(int direction = 1, int data = 1)
+// {
+// 	for (int i = 0; i < 1024; i++)
+// 	{
+// 		// if (data == 1)
+// 		//     direction = 1;   // Switch to increasing
+// 		// else if (data == RANGE-1)
+// 		//     direction = -1;  // Switch to decreasing
+// 		// data += direction;
+// 		bcm2835_pwm_set_data(PWM_CHANNEL, i);
+// 		bcm2835_delay(1);
+// 	}
+// }
 
-void pwm_close()
-{
-	bcm2835_close();
-}
+// void pwm_close()
+// {
+// 	bcm2835_close();
+// }
 
 // void cw_motor(int speed)
 // {
