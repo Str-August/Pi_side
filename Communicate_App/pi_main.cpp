@@ -4,7 +4,7 @@ void * sendSerial_SBUS (void * socket)
 {
 	//static unsigned int pre_time = micros();
 	while(true){
-			socketCommunicate server = *((socketCommunicate *) socket);
+			//socketCommunicate server = *((socketCommunicate *) socket);
 			server.get_throttle();	
 
 
