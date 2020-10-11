@@ -5,7 +5,7 @@ void * sendSerial_SBUS (void * socket)
 	//static unsigned int pre_time = micros();
 	while(true){
 			//socketCommunicate server = *((socketCommunicate *) socket);
-			server.get_throttle();	
+			//server.get_throttle();	
 
 
 
@@ -18,13 +18,13 @@ void * sendSerial_SBUS (void * socket)
 int main()
 {
 	
-	socket_addr.Init();
+	sock_addr.Init();
 	
 	pthread_t thread;
 	//pthread_create(&thread, NULL, sendSerial_SBUS, (void *) &test );
 
 
-	socket_addr.ConnectClient();	
+	sock_addr.ConnectClient();	
 
 	return 0;
 }
