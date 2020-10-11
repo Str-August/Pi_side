@@ -291,7 +291,7 @@ void socketCommunicate::handleMotorCut(string message)
 {
     if (strcmp(str2Char(message), "on") == 0)
     {
-        pwm_setup();
+        setup_motor();
         active_motor();
     }
     else if (strcmp(str2Char(message), "off") == 0)
