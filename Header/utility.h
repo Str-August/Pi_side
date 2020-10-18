@@ -8,7 +8,7 @@
 
 #include <wiringPi.h>
 
-#include <bcm2835.h>
+//#include <bcm2835.h>
 #include <stdio.h>
 
 // PWM output on RPi Plug P1 pin 18 (which is GPIO pin 18)
@@ -50,7 +50,7 @@ bool setup_motor()
 	pinMode(PWM_pin, PWM_OUTPUT);
 	pwmSetMode(PWM_MODE_MS);
 	pwmSetClock(1920);
-	pwmSetRange(200)
+	pwmSetRange(200);
 	//pwmSetClock (divisor)
 	//pwmSetMode (mode) mode can be PWM_MODE_BAL  or PWM_MODE_MS
 	//pwmSetRange (range)
