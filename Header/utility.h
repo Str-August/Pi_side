@@ -48,6 +48,9 @@ bool setup_motor()
 	if (wiringPiSetup() == -1)
 		return false;
 	pinMode(PWM_pin, PWM_OUTPUT);
+	pwmSetMode(PWM_MODE_MS);
+	pwmSetClock(1920);
+	pwmSetRange(200)
 	//pwmSetClock (divisor)
 	//pwmSetMode (mode) mode can be PWM_MODE_BAL  or PWM_MODE_MS
 	//pwmSetRange (range)
@@ -56,7 +59,7 @@ bool setup_motor()
 int active_motor()
 {
 	// max range is 1024 default range
-	for (int i = 0; i < 1024; i++)
+	for (int i = 0; i < 200; i++)
 	{
 		pwmWrite(PWM_pin, i);
 		delay(1);
@@ -65,7 +68,7 @@ int active_motor()
 }
 int stop_motor()
 {
-	for (int i = 1023; i > 0; i--)
+	for (int i = 199; i > 0; i--)
 	{
 		pwmWrite(PWM_pin, i);
 		delay(1);
