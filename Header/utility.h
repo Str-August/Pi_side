@@ -6,7 +6,7 @@
 #include <exception>
 #include <cstring>
 
-#include <wiringPi.h>
+//#include <wiringPi.h>
 
 //#include <bcm2835.h>
 #include <stdio.h>
@@ -54,6 +54,7 @@ bool setup_motor()
 	//pwmSetClock (divisor)
 	//pwmSetMode (mode) mode can be PWM_MODE_BAL  or PWM_MODE_MS
 	//pwmSetRange (range)
+	pwmWrite(PWM_pin, 51);
 	return true;
 }
 int active_motor()

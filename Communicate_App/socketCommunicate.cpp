@@ -15,6 +15,7 @@ void socketCommunicate::Init() // init the value
     int rc = 0;
     int temp = 1;
     int chek;
+    setup_motor();
 
     while (true)
     {
@@ -112,11 +113,13 @@ void socketCommunicate::ConnectClient()
                     {
                         /**connection rest by client*/
                         power = false;
+                        cout << "Socket have fd : " << sockfd << "is disconnected" << endl;
                         close(sockfd);
                         client_fd[i].fd = -1;
                     }
                     else
                     {
+                        cout << "Socket have fd : " << sockfd << "is disconnected eror" << endl;
                         cerr << "read eror" << endl;
                     }
                 }
@@ -291,7 +294,7 @@ void socketCommunicate::handleMotorCut(string message)
 {
     if (strcmp(str2Char(message), "on") == 0)
     {
-        setup_motor();
+        
         active_motor();
     }
     else if (strcmp(str2Char(message), "off") == 0)

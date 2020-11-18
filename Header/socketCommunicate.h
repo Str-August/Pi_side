@@ -18,7 +18,7 @@
 
 using namespace std;
 
-#define POLL_SIZE 2	// fd max (number client ) can connect server
+#define POLL_SIZE 6	// fd max (number client ) can connect server
 #define LOCAL_HOST_SOCK 5533  // local host for socket
 
 class socketCommunicate {
@@ -50,8 +50,6 @@ public:
 	int get_yaw();
 	int get_roll();
 	int get_pitch();
-
-
 	
 };
 
