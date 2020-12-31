@@ -6,7 +6,7 @@
 #include <exception>
 #include <cstring>
 
-//#include <wiringPi.h>
+#include <wiringPi.h>
 
 //#include <bcm2835.h>
 #include <stdio.h>
