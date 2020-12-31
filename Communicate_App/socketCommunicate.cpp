@@ -169,7 +169,7 @@ void socketCommunicate::analyReceivingData()
 
     switch (str2int(str2Char(message)))
     {
-    case str2int("JoyR"):
+    case str2int("pitch"):
         message.clear();
         lenMess = 0;
         while (true)
@@ -189,8 +189,10 @@ void socketCommunicate::analyReceivingData()
             message.push_back(byte_r);
         }
         pitch = atoi(str2Char(message));
-        cout << "pitch: " << pitch << " roll: ";
+        cout << "pitch: " << pitch << endl;
 
+        break;
+    case str2int("roll"):
         message.clear();
         lenMess = 0;
         while (true)
@@ -200,6 +202,9 @@ void socketCommunicate::analyReceivingData()
                 break;
             lenMess = lenMess * 10 + (byte_r - '0');
         }
+        if (lenMess == 0)
+            break;
+        roll = 0;
         for (int i = 0; i < lenMess; ++i)
         {
             /* code */
@@ -207,7 +212,7 @@ void socketCommunicate::analyReceivingData()
             message.push_back(byte_r);
         }
         roll = atoi(str2Char(message));
-        cout << roll << endl;
+        cout << "roll: " << pitch << endl;
 
         break;
     case str2int("power"):
@@ -228,7 +233,7 @@ void socketCommunicate::analyReceivingData()
         }
         cout << message << endl;
         break;
-    case str2int("JoyL"):
+    case str2int("throttle"):
         message.clear();
         lenMess = 0;
         while (true)
@@ -246,7 +251,11 @@ void socketCommunicate::analyReceivingData()
             message.push_back(byte_r);
         }
         throttle = atoi(str2Char(message));
-        cout << "throttle: " << throttle << " yaw: ";
+        cout << "throttle: " << throttle << endl;
+        
+        //cout<<yaw<<endl;
+        break;
+    case str2int("yaw"):
         message.clear();
         lenMess = 0;
         while (true)
@@ -264,9 +273,9 @@ void socketCommunicate::analyReceivingData()
             message.push_back(byte_r);
         }
         yaw = atoi(str2Char(message));
-        cout << yaw << endl;
-        //cout<<yaw<<endl;
+        cout << "yaw : "<<yaw << endl;
         break;
+
     case str2int("motor"):
         message.clear();
         lenMess = 0;
@@ -292,15 +301,15 @@ void socketCommunicate::analyReceivingData()
 
 void socketCommunicate::handleMotorCut(string message)
 {
-    if (strcmp(str2Char(message), "on") == 0)
-    {
+    // if (strcmp(str2Char(message), "on") == 0)
+    // {
         
-        active_motor();
-    }
-    else if (strcmp(str2Char(message), "off") == 0)
-    {
-        stop_motor();
-    }
+    //     active_motor();
+    // }
+    // else if (strcmp(str2Char(message), "off") == 0)
+    // {
+    //     stop_motor();
+    // }
 
     // if(strcmp(str2Char(message),"on")==0)
     // {
