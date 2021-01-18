@@ -1,5 +1,13 @@
 #include "../Header/socketCommunicate.h"
 #include "../Header/utility.h"
+#include <pthread.h>
+#include <time.h>
+static bool connect_status = true, check_rev = true;
+static unsigned int send_time;
+pthread_t thread_check;
+static bool connected = false;
+//static unsigned long time_re, last_time, time_de = 4 * 1024 * 1024;
+
 void socketCommunicate::Init() // init the value
 {
     bzero((struct sockaddr *)&server_address, sizeof(server_address));
@@ -15,7 +23,7 @@ void socketCommunicate::Init() // init the value
     int rc = 0;
     int temp = 1;
     int chek;
-    setup_motor();
+    //setup_motor();
 
     while (true)
     {
@@ -54,28 +62,69 @@ void socketCommunicate::Init() // init the value
     cout << "Waiting for connection........ \n"
          << endl;
 }
+void *checkClient(void *fd)
+{
+    char buf = 'a';
+    static unsigned int pre_time;
+    pre_time = micros();
+    while (connected)
+    {
+
+        if (check_rev == false)
+        {
+            connect_status = false;
+        }
+        else
+        {
+            connect_status = true;
+        }
+
+        if (write(*((int *)fd), &buf, sizeof(buf)) < 0)
+        {
+            connect_status = false;
+        }
+  //      cout<<buf<<endl;
+        check_rev = false;
+        send_time = micros();
+        int32_t sleepTime = pre_time + 3000000 - micros();
+        if(sleepTime > 0&& sleepTime < 3000000)
+            usleep(sleepTime);
+        pre_time = micros();
+    }
+    return 0;
+}
+
 void socketCommunicate::EventServer()
 {
+
     if (client_fd[0].revents & POLLRDNORM) /*New client connection*/
     {
+
         clilen = sizeof(client_address);
         connfd = accept(listenfd, (struct sockaddr *)&client_address, &clilen);
 
+        int temp = 1, so_keepalive = 1, tcp_timeout = 1000;
         for (i = 1; i < POLL_SIZE; i++)
         {
             if (client_fd[i].fd < 0)
             {
                 cout << "Socket have fd: " << connfd << " is connected" << endl;
                 client_fd[i].fd = connfd; /*Save descriptor*/
+                connect_status = true;
+                check_rev = true;
+                //pthread_cancel(thread_check);
+                //usleep(100);
+                connected = true;
+                pthread_create(&thread_check, NULL, checkClient, (void *)&connfd);
                 break;
             }
         }
-
+        sleep(2);
         if (i == POLL_SIZE)
         {
-            char buf[20];
-            strcpy(buf, "too many connection"); /*Max index in client[] array*/
-            write(connfd, &buf, 20);
+            //char buf[20];
+            //strcpy(buf, "too many connection"); /*Max index in client[] array*/
+            //write(connfd, &buf, 20);
         }
 
         client_fd[i].events = POLLRDNORM;
@@ -90,56 +139,96 @@ void socketCommunicate::EventServer()
 
 void socketCommunicate::ConnectClient()
 {
-
+    static unsigned int rev_time = micros();
+    bool cout_dis = true;
     while (true)
     {
+        nready = poll(client_fd, maxi + 1, 2000);
 
-        nready = poll(client_fd, maxi + 1, -1);
         EventServer();
-
+        //cout<< "where 3"<<endl;
         for (i = 1; i <= maxi; i++) /**Check all client for data*/
         {
+//            cout<< "where 4"<<endl;
             //place to declare package
             //unsigned char byte_r;
-
+            // check here for status
+            usleep(100);
             if ((sockfd = client_fd[i].fd) < 0)
                 continue;
-
-            if (client_fd[i].revents & (POLLRDNORM | POLLERR))
+            if (!connect_status)
             {
-                if ((n = read(sockfd, &byte_r, sizeof(byte_r))) < 0)
+                power = false;
+                cout << "Socket have fd : " << sockfd << " is disconnected" << endl;
+                close(sockfd);
+                client_fd[i].fd = -1;
+                connect_status = true;
+                connected = false;
+                // pthread_cancel(thread_check);
+                sleep(1);
+            }
+            else
+            {
+                if (client_fd[i].revents & (POLLRDNORM | POLLERR))
                 {
-                    if (errno == ECONNRESET)
+                    
+                    if ((n = read(sockfd, &byte_r, sizeof(byte_r))) < 0)
                     {
-                        /**connection rest by client*/
-                        power = false;
+                        if (errno == ECONNRESET)
+                        {
+                            /**connection rest by client*/
+                            power = false;
+                            cout << "Socket have fd : " << sockfd << "is disconnected" << endl;
+                            close(sockfd);
+                            client_fd[i].fd = -1;
+                            connected = false;
+                            // pthread_cancel(thread_check);
+                            sleep(1);
+                        }
+                        /*else if (errno == ENETRESET)
+                        {
+                            /**connection rest by client*/
+                           // power = false;
+                           // cout << "Socket have fd : " << sockfd << "disconnected" << endl;
+                            //close(sockfd);
+                           // client_fd[i].fd = -1;
+                           // connected = false;
+                            // pthread_cancel(thread_check);
+                       // }*/
+                        else
+
+                        {
+                            cout << "Socket have fd : " << sockfd << "is disconnected eror" << endl;
+                            cerr << "read eror" << endl;
+                            connected = false;
+                            // pthread_cancel(thread_check);
+                        }
+                    }
+                    else if (n == 0)
+                    {
+                        /**connection close by client*/
                         cout << "Socket have fd : " << sockfd << "is disconnected" << endl;
+                        power = false;
                         close(sockfd);
                         client_fd[i].fd = -1;
+                        connected = false;
+                        // pthread_cancel(thread_check);
                     }
                     else
                     {
-                        cout << "Socket have fd : " << sockfd << "is disconnected eror" << endl;
-                        cerr << "read eror" << endl;
+                        //recieved package in here
+                        if (byte_r == '!')
+                            analyReceivingData();
+                        else if (byte_r = 'b')
+                        {
+                            cout << "receive b" << endl;
+                            check_rev = true;
+                        }
                     }
-                }
-                else if (n == 0)
-                {
-                    /**connection close by client*/
-                    cout << "Socket have fd : " << sockfd << "is disconnected" << endl;
-                    power = false;
-                    close(sockfd);
-                    client_fd[i].fd = -1;
-                }
-                else
-                {
-                    //recieved package in here
-                    if (byte_r == '!')
-                        analyReceivingData();
-                }
 
-                if (--nready <= 0)
-                    break; /** no more readable descriptors */
+                    if (--nready <= 0)
+                        break; /** no more readable descriptors */
+                }
             }
         }
     }
@@ -189,7 +278,7 @@ void socketCommunicate::analyReceivingData()
             message.push_back(byte_r);
         }
         pitch = atoi(str2Char(message));
-        cout << "pitch: " << pitch << endl;
+        cout << pitch << endl;
 
         break;
     case str2int("roll"):
@@ -212,7 +301,7 @@ void socketCommunicate::analyReceivingData()
             message.push_back(byte_r);
         }
         roll = atoi(str2Char(message));
-        cout << "roll: " << pitch << endl;
+        cout << pitch << endl;
 
         break;
     case str2int("power"):
@@ -232,6 +321,15 @@ void socketCommunicate::analyReceivingData()
             message.push_back(byte_r);
         }
         cout << message << endl;
+	throttle = 1000;
+	if(strcmp(str2Char(message),"on")==0)
+	{
+		power = true;
+	}
+	else
+	{
+		power = false;
+	}
         break;
     case str2int("throttle"):
         message.clear();
@@ -251,8 +349,8 @@ void socketCommunicate::analyReceivingData()
             message.push_back(byte_r);
         }
         throttle = atoi(str2Char(message));
-        cout << "throttle: " << throttle << endl;
-        
+        cout << throttle << endl;
+
         //cout<<yaw<<endl;
         break;
     case str2int("yaw"):
@@ -273,7 +371,7 @@ void socketCommunicate::analyReceivingData()
             message.push_back(byte_r);
         }
         yaw = atoi(str2Char(message));
-        cout << "yaw : "<<yaw << endl;
+        cout << yaw << endl;
         break;
 
     case str2int("motor"):
@@ -296,14 +394,13 @@ void socketCommunicate::analyReceivingData()
         handleMotorCut(message);
         break;
     }
-    return;
 }
 
 void socketCommunicate::handleMotorCut(string message)
 {
     // if (strcmp(str2Char(message), "on") == 0)
     // {
-        
+
     //     active_motor();
     // }
     // else if (strcmp(str2Char(message), "off") == 0)
